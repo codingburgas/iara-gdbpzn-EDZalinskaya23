@@ -1,0 +1,17 @@
+# created by virtualenv automatically
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Database (generated locally from schema.sql + seed.sql)
+database/*.db
+instance/
+
+# IDE / ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
