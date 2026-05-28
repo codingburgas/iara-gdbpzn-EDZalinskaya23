@@ -1,0 +1,82 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Roles and access" id="roles1">
+    <mxGraphModel dx="1106" dy="559" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="citizen" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Citizen&#xa;(no login)" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Submit an incident report" vertex="1">
+          <mxGeometry height="40" width="240" x="260" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ce" edge="1" parent="1" source="citizen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="c1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="disp" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Dispatcher&#xa;(control room)" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Register incidents (type, address, GPS)" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="View staff statuses and assign the team" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Assign tasks and approve resource requests" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Change incident status, chat" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="de1" edge="1" parent="1" source="disp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de2" edge="1" parent="1" source="disp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de3" edge="1" parent="1" source="disp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de4" edge="1" parent="1" source="disp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="d4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ff" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Firefighter" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="ff1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="View own incidents and confirm participation" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="ff2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Report tasks and request resources" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="ff3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Write in the chat (templates / free text)" vertex="1">
+          <mxGeometry height="40" width="260" x="260" y="555" as="geometry" />
+        </mxCell>
+        <mxCell id="fe1" edge="1" parent="1" source="ff" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="ff1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fe2" edge="1" parent="1" source="ff" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="ff2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fe3" edge="1" parent="1" source="ff" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="ff3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="adm" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Administrator" vertex="1">
+          <mxGeometry height="60" width="120" x="640" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage staff (add / edit)" vertex="1">
+          <mxGeometry height="40" width="240" x="820" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Manage vehicles and roles" vertex="1">
+          <mxGeometry height="40" width="240" x="820" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="ae1" edge="1" parent="1" source="adm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="a1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ae2" edge="1" parent="1" source="adm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="a2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
