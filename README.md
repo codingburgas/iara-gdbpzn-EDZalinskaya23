@@ -1,4 +1,4 @@
-# Fire Safety Management System (GDPBZN)
+# Fire Safety Management System (ГДПБЗН)
 
 A learning project — a web application that supports the daily operations of a
 fire department: registering incidents, managing teams and staff, distributing
