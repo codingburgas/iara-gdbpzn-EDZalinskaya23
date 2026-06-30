@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Ново произшествие{% endblock %}
+
+{# Load Leaflet map (CDN) #}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Ново произшествие</h1>
+    <p class="muted">Кликнете върху картата, за да отбележите точното място (GPS координати).</p>
+
+    <form method="post" class="form">
+        <div class="cols">
+            <div class="col">
+                <label>Тип *
+                    <select name="type" required>
+                        <option value="">— изберете —</option>
+                        {% for t in types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </label>
+                <label>Канал на постъпване
+                    <select name="channel">
+                        <option value="112">112</option>
+                        <option value="Телефон">Телефон</option>
+                        <option value="Онлайн">Онлайн</option>
+                    </select>
+                </label>
+                <label>Адрес / място *
+                    <input type="text" name="address" id="address" placeholder="напр. гр. София, ул. ..." required>
+                </label>
+                <button type="button" class="btn btn-small btn-outline" id="find-btn">Намери на картата</button>
+                <label>Описание
+                    <textarea name="description" rows="3"></textarea>
+                </label>
+            </div>
+            <div class="col">
+                <label>Местоположение (по избор)</label>
+                <div id="map"></div>
+                <p class="small muted">
+                    GPS: <span id="coords">не е избрано</span>
+                </p>
+                <input type="hidden" name="lat" id="lat">
+                <input type="hidden" name="lng" id="lng">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Създай произшествие</button>
+            <a class="btn btn-outline" href="{{ url_for('incidents.list_incidents') }}">Отказ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Center the map on Sofia
+    const map = L.map('map').setView([42.6977, 23.3219], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker = null;
+
+    // Place the marker and store its coordinates in the hidden fields
+    function setPoint(lat, lng) {
+        const pos = [lat, lng];
+        if (marker) {
+            marker.setLatLng(pos);
+        } else {
+            marker = L.marker(pos).addTo(map);
+        }
+        document.getElementById('lat').value = Number(lat).toFixed(5);
+        document.getElementById('lng').value = Number(lng).toFixed(5);
+        document.getElementById('coords').textContent =
+            Number(lat).toFixed(5) + ', ' + Number(lng).toFixed(5);
+    }
+
+    // Click on the map: set the point and fill the address (reverse geocoding)
+    map.on('click', function (e) {
+        setPoint(e.latlng.lat, e.latlng.lng);
+        const url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' +
+                    e.latlng.lat + '&lon=' + e.latlng.lng;
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.display_name) {
+                    document.getElementById('address').value = data.display_name;
+                }
+            })
+            .catch(function () { /* if geocoding fails, the manual point still works */ });
+    });
+
+    // "Намери на картата": geocode the typed address and place a marker
+    document.getElementById('find-btn').addEventListener('click', function () {
+        const q = document.getElementById('address').value.trim();
+        if (!q) return;
+        const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=' +
+                    encodeURIComponent(q);
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (results) {
+                if (results && results.length) {
+                    const lat = parseFloat(results[0].lat);
+                    const lng = parseFloat(results[0].lon);
+                    setPoint(lat, lng);
+                    map.setView([lat, lng], 16);
+                } else {
+                    alert('Адресът не е намерен на картата.');
+                }
+            })
+            .catch(function () { alert('Грешка при търсене на адреса.'); });
+    });
+</script>
+{% endblock %}

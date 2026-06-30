@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Произшествие #{{ incident.id }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('incidents.list_incidents') }}">← Всички произшествия</a>
+
+<div class="card">
+    <h1>{{ incident.type }} <span class="muted">#{{ incident.id }}</span></h1>
+    <p><strong>Адрес:</strong> {{ incident.address }}</p>
+    <p><strong>Канал:</strong> {{ incident.channel }} &nbsp;|&nbsp;
+       <strong>Създадено:</strong> {{ incident.created_at }}</p>
+    {% if incident.description %}<p><strong>Описание:</strong> {{ incident.description }}</p>{% endif %}
+
+    <p><strong>Статус:</strong>
+        {% if incident.status == 'Нова' %}<span class="badge badge-new">{{ incident.status }}</span>
+        {% elif incident.status == 'В процес' %}<span class="badge badge-progress">{{ incident.status }}</span>
+        {% else %}<span class="badge badge-done">{{ incident.status }}</span>{% endif %}
+    </p>
+
+    {% if current_user.role in ['dispatcher', 'admin'] %}
+    <form method="post" action="{{ url_for('incidents.change_incident_status', incident_id=incident.id) }}" class="inline">
+        <select name="status">
+            {% for s in statuses %}<option value="{{ s }}" {% if incident.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-small btn-primary">Смени статуса</button>
+    </form>
+    {% endif %}
+
+    {# Confirm button: shown when the user is on the team and not confirmed #}
+    {% if my_assignment and my_assignment.confirmed == 0 %}
+        <form method="post" action="{{ url_for('incidents.confirm_assignment', incident_id=incident.id) }}" style="margin-top:10px;">
+            <button type="submit" class="btn btn-danger">Заемам се с произшествието</button>
+        </form>
+    {% elif my_assignment and my_assignment.confirmed == 1 %}
+        <p class="muted">✓ Потвърдихте участие.</p>
+    {% endif %}
+
+    {% if incident.lat and incident.lng %}
+        <div id="map"></div>
+    {% endif %}
+</div>
+
+<div class="cols">
+    <!-- Team -->
+    <div class="col">
+        <div class="card">
+            <h2>Екип</h2>
+            {% if team %}
+            <table>
+                <tbody>
+                    {% for m in team %}
+                    <tr>
+                        <td>{{ m.full_name }}<br><span class="small muted">{{ m.position or '' }}</span></td>
+                        <td>{% if m.confirmed %}<span class="badge badge-done">потвърдил</span>
+                            {% else %}<span class="badge badge-progress">изчаква</span>{% endif %}</td>
+                        {% if current_user.role in ['dispatcher', 'admin'] %}
+                        <td>
+                            <form method="post" action="{{ url_for('incidents.unassign_member', incident_id=incident.id, user_id=m.user_id) }}">
+                                <button class="btn btn-small btn-outline">Махни</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}<p class="muted">Все още няма назначен екип.</p>{% endif %}
+
+            {% if current_user.role in ['dispatcher', 'admin'] %}
+            <form method="post" action="{{ url_for('incidents.assign_member', incident_id=incident.id) }}" class="form" style="margin-top:12px;">
+                <label>Назначи служител
+                    <select name="user_id" required>
+                        <option value="">— изберете —</option>
+                        {# Available staff, grouped by category #}
+                        {% for category, members in available_groups %}
+                        <optgroup label="{{ category }}">
+                            {% for a in members %}<option value="{{ a.id }}">{{ a.full_name }} ({{ a.position or 'служител' }})</option>{% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                        {# Unavailable staff: greyed, disabled, at the very bottom #}
+                        {% if unavailable %}
+                        <optgroup label="Недостъпни">
+                            {% for a in unavailable %}<option value="{{ a.id }}" disabled style="color:#9aa0ab">{{ a.full_name }} — {{ a.status }}</option>{% endfor %}
+                        </optgroup>
+                        {% endif %}
+                    </select>
+                </label>
+                <button type="submit" class="btn btn-small btn-primary">Назначи</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Resource requests -->
+        <div class="card">
+            <h2>Заявки за ресурси</h2>
+            {% if resources %}
+            <table>
+                <tbody>
+                    {% for r in resources %}
+                    <tr>
+                        <td>{{ r.resource_type }}<br><span class="small muted">{{ r.description or '' }}</span></td>
+                        <td>
+                            {% if current_user.role in ['dispatcher', 'admin'] %}
+                            <form method="post" action="{{ url_for('resources.update_resource_status', request_id=r.id) }}" class="inline">
+                                <select name="status" onchange="this.form.submit()">
+                                    {% for s in ['Заявена','Одобрена','Доставена'] %}
+                                        <option value="{{ s }}" {% if r.status == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                            {% else %}<span class="badge">{{ r.status }}</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}<p class="muted">Няма заявки.</p>{% endif %}
+
+            <form method="post" action="{{ url_for('resources.add_resource', incident_id=incident.id) }}" class="form" style="margin-top:12px;">
+                <label>Нова заявка<input type="text" name="resource_type" placeholder="напр. Цистерна с вода" required></label>
+                <input type="text" name="description" placeholder="Описание (по избор)">
+                <button type="submit" class="btn btn-small btn-primary" style="margin-top:8px;">Заяви</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="col">
+        <div class="card">
+            <h2>Задачи</h2>
+            {% if tasks %}
+            <table>
+                <tbody>
+                    {% for t in tasks %}
+                    <tr>
+                        <td>
+                            <span class="badge">{{ t.category }}</span><br>
+                            {{ t.description }}<br>
+                            <span class="small muted">Отговорник: {{ t.assignee or '—' }}</span>
+                        </td>
+                        <td>
+                            <form method="post" action="{{ url_for('tasks.update_task_status', task_id=t.id) }}" class="inline">
+                                <select name="status" onchange="this.form.submit()">
+                                    {% for s in ['Нова','В процес','Приключена'] %}
+                                        <option value="{{ s }}" {% if t.status == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}<p class="muted">Няма задачи.</p>{% endif %}
+
+            {% if current_user.role in ['dispatcher', 'admin'] %}
+            <form method="post" action="{{ url_for('tasks.add_task', incident_id=incident.id) }}" class="form" style="margin-top:12px;">
+                <label>Нова задача<input type="text" name="description" placeholder="Описание на задачата" required></label>
+                <label>Категория
+                    <select name="category">
+                        {% for c in ['Оперативна','Логистична','Административна','Друга'] %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </label>
+                <label>Възложи на
+                    <select name="assigned_to">
+                        <option value="">— никого —</option>
+                        {% for m in team %}<option value="{{ m.user_id }}">{{ m.full_name }}</option>{% endfor %}
+                    </select>
+                </label>
+                <button type="submit" class="btn btn-small btn-primary">Добави задача</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chat -->
+<div class="card" id="chat">
+    <h2>Чат по събитието</h2>
+    <div class="chat">
+        <div class="chat-list" id="chat-list">
+            {% if messages %}
+                {% for m in messages %}
+                <div class="chat-msg">
+                    <span class="who">{{ m.author or 'Система' }}</span>
+                    <span class="time">{{ m.created_at }}</span>
+                    <div>{{ m.body }}</div>
+                </div>
+                {% endfor %}
+            {% else %}<p class="muted">Все още няма съобщения.</p>{% endif %}
+        </div>
+    </div>
+
+    <form method="post" action="{{ url_for('messages.add_message', incident_id=incident.id) }}" class="form" style="margin-top:12px;">
+        <label>Готов шаблон (по избор)
+            <select onchange="document.getElementById('msg-body').value = this.value">
+                <option value="">— избери шаблон —</option>
+                {% for tpl in templates %}<option value="{{ tpl.text }}">{{ tpl.text }}</option>{% endfor %}
+            </select>
+        </label>
+        <textarea name="body" id="msg-body" rows="2" placeholder="Напишете съобщение..." required></textarea>
+        <button type="submit" class="btn btn-small btn-primary" style="margin-top:8px;">Изпрати</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Live updates for the incident chat (visible to all assigned users + dispatcher)
+    startChatPolling('chat-list', "{{ url_for('messages.incident_messages_json', incident_id=incident.id) }}", 4000);
+</script>
+{% if incident.lat and incident.lng %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Show a marker at the incident location
+    const lat = {{ incident.lat }};
+    const lng = {{ incident.lng }};
+    const map = L.map('map').setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.marker([lat, lng]).addTo(map).bindPopup('{{ incident.type }}').openPopup();
+</script>
+{% endif %}
+{% endblock %}

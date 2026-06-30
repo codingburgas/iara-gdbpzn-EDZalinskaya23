@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Произшествия{% endblock %}
+
+{% macro status_badge(status) %}
+    {% if status == 'Нова' %}<span class="badge badge-new">{{ status }}</span>
+    {% elif status == 'В процес' %}<span class="badge badge-progress">{{ status }}</span>
+    {% else %}<span class="badge badge-done">{{ status }}</span>{% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="cols" style="align-items:center; justify-content:space-between;">
+    <h1>Произшествия</h1>
+    {% if current_user.role in ['dispatcher', 'admin'] %}
+        <a class="btn btn-danger" href="{{ url_for('incidents.create_incident') }}">+ Ново произшествие</a>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th><th>Тип</th><th>Адрес</th><th>Канал</th>
+            <th>Екип</th><th>Статус</th><th>Създадено</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in incidents %}
+        <tr>
+            <td>{{ i.id }}</td>
+            <td><a href="{{ url_for('incidents.incident_detail', incident_id=i.id) }}">{{ i.type }}</a></td>
+            <td>{{ i.address }}</td>
+            <td>{{ i.channel }}</td>
+            <td>{{ i.team_size }}</td>
+            <td>{{ status_badge(i.status) }}</td>
+            <td class="small muted">{{ i.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
