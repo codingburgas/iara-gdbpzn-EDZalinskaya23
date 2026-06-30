@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Табло{% endblock %}
+
+{% block content %}
+<h1>Здравейте, {{ current_user.full_name }}</h1>
+<p class="muted">Роля: {{ role_labels.get(current_user.role, current_user.role) }} · Статус: <span class="badge">{{ current_user.status }}</span></p>
+
+{# ===================== FIREFIGHTER VIEW ===================== #}
+{% if current_user.role == 'firefighter' %}
+
+    {# Self status change #}
+    <div class="card">
+        <h2>Моят статус</h2>
+        <form method="post" action="{{ url_for('dashboard.set_my_status') }}" class="inline">
+            <select name="status">
+                {% for s in self_statuses %}
+                    <option value="{{ s }}" {% if current_user.status == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-small btn-primary">Промени</button>
+        </form>
+        <p class="small muted">Когато сте „На произшествие“, статусът се управлява от оперативния център.</p>
+    </div>
+
+    {# My active incidents #}
+    <div class="card">
+        <h2>Моите произшествия</h2>
+        {% if my_incidents %}
+            <ul class="list">
+                {% for inc in my_incidents %}
+                <li>
+                    <span>
+                        <a href="{{ url_for('incidents.incident_detail', incident_id=inc.id) }}">
+                            #{{ inc.id }} · {{ inc.type }} — {{ inc.address }}
+                        </a>
+                        <span class="badge">{{ inc.status }}</span>
+                    </span>
+                    <span>
+                        {% if inc.confirmed == 0 %}
+                            <form method="post" action="{{ url_for('incidents.confirm_assignment', incident_id=inc.id) }}" class="inline">
+                                <button type="submit" class="btn btn-small btn-danger">Заемам се</button>
+                            </form>
+                        {% else %}
+                            <span class="badge badge-done">потвърдено</span>
+                        {% endif %}
+                        <a class="btn btn-small btn-outline" href="{{ url_for('incidents.incident_detail', incident_id=inc.id) }}#chat">Чат</a>
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">Нямате активни произшествия в момента.</p>
+        {% endif %}
+    </div>
+
+    {# My tasks #}
+    <div class="card">
+        <h2>Моите задачи</h2>
+        {% if my_tasks %}
+            <table>
+                <tbody>
+                    {% for t in my_tasks %}
+                    <tr>
+                        <td>
+                            <span class="badge">{{ t.category }}</span> {{ t.description }}<br>
+                            <span class="small muted">
+                                <a href="{{ url_for('incidents.incident_detail', incident_id=t.incident_id) }}">
+                                    #{{ t.incident_id }} · {{ t.incident_type }} — {{ t.address }}
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <form method="post" action="{{ url_for('tasks.update_task_status', task_id=t.id) }}" class="inline">
+                                <select name="status" onchange="this.form.submit()">
+                                    {% for s in ['Нова','В процес','Приключена'] %}
+                                        <option value="{{ s }}" {% if t.status == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">Нямате възложени задачи.</p>
+        {% endif %}
+    </div>
+
+    {# Call history #}
+    {% if history %}
+    <div class="card">
+        <h2>История на произшествия</h2>
+        <ul class="list">
+            {% for inc in history %}
+            <li>
+                <a href="{{ url_for('incidents.incident_detail', incident_id=inc.id) }}">
+                    #{{ inc.id }} · {{ inc.type }} — {{ inc.address }}
+                </a>
+                <span class="small muted">{{ inc.created_at }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+{# ===================== DISPATCHER / ADMIN VIEW ===================== #}
+{% else %}
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-num">{{ active_incidents }}</div>
+            <div class="stat-label">Активни произшествия</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">{{ available_staff }}</div>
+            <div class="stat-label">Налични пожарникари</div>
+        </div>
+    </div>
+
+    <div class="quick-links">
+        <a class="btn btn-primary" href="{{ url_for('incidents.list_incidents') }}">Всички произшествия</a>
+        {% if current_user.role == 'dispatcher' %}
+            <a class="btn btn-danger" href="{{ url_for('incidents.create_incident') }}">+ Ново произшествие</a>
+        {% endif %}
+        {% if current_user.role in ['admin', 'dispatcher'] %}
+            <a class="btn btn-outline" href="{{ url_for('employees.list_employees') }}">Служители</a>
+        {% endif %}
+    </div>
+
+{% endif %}
+
+{# ===================== OPERATIONS CHANNEL (both roles) ===================== #}
+<div class="card" id="ops">
+    <h2>Връзка с оперативния център</h2>
+    <div class="chat">
+        <div class="chat-list" id="ops-chat-list">
+            {% if ops_messages %}
+                {% for m in ops_messages %}
+                <div class="chat-msg">
+                    <span class="who">{{ m.author or 'Система' }}</span>
+                    <span class="time">{{ m.created_at }}</span>
+                    <div>{{ m.body }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="muted">Все още няма съобщения.</p>
+            {% endif %}
+        </div>
+    </div>
+    <form method="post" action="{{ url_for('ops.add_ops_message') }}" class="form" style="margin-top:12px;">
+        <label>Готов шаблон (по избор)
+            <select onchange="document.getElementById('ops-body').value = this.value">
+                <option value="">— избери шаблон —</option>
+                {% for tpl in templates %}<option value="{{ tpl.text }}">{{ tpl.text }}</option>{% endfor %}
+            </select>
+        </label>
+        <textarea name="body" id="ops-body" rows="2" placeholder="Съобщение до оперативния център..." required></textarea>
+        <button type="submit" class="btn btn-small btn-primary" style="margin-top:8px;">Изпрати</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Live updates for the operations channel
+    startChatPolling('ops-chat-list', "{{ url_for('ops.ops_messages_json') }}", 4000);
+</script>
+{% endblock %}
