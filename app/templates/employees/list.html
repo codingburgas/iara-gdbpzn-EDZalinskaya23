@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Служители{% endblock %}
+
+{% block content %}
+<div class="cols" style="align-items:center; justify-content:space-between;">
+    <h1>Служители</h1>
+    <div class="quick-links">
+        {% if current_user.role == 'admin' %}
+            <a class="btn btn-primary" href="{{ url_for('employees.create_employee') }}">+ Нов служител</a>
+            <a class="btn btn-outline" href="{{ url_for('employees.vehicles') }}">Автомобили</a>
+        {% endif %}
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Име</th>
+            <th>Длъжност</th>
+            <th>Роля</th>
+            <th>Автомобил</th>
+            <th>Статус</th>
+            {% if current_user.role == 'admin' %}<th></th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in employees %}
+        <tr>
+            <td>{{ e.full_name }}</td>
+            <td>{{ e.position or '—' }}</td>
+            <td>{{ role_labels.get(e.role, e.role) }}</td>
+            <td>{{ e.vehicle_name or '—' }}</td>
+            <td>
+                {# Quick status change #}
+                <form method="post" action="{{ url_for('employees.change_status', user_id=e.id) }}" class="inline">
+                    <select name="status" onchange="this.form.submit()">
+                        {% for s in statuses %}
+                            <option value="{{ s }}" {% if e.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+            {% if current_user.role == 'admin' %}
+            <td><a href="{{ url_for('employees.edit_employee', user_id=e.id) }}">Редактирай</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

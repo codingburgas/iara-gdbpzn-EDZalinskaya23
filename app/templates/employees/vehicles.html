@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Автомобили{% endblock %}
+
+{% block content %}
+<h1>Пожарни автомобили</h1>
+
+<div class="cols">
+    <div class="col">
+        <table>
+            <thead>
+                <tr><th>Име</th><th>Рег. номер</th><th>Тип</th></tr>
+            </thead>
+            <tbody>
+                {% for v in vehicles %}
+                <tr><td>{{ v.name }}</td><td>{{ v.plate or '—' }}</td><td>{{ v.type or '—' }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <h2>Нов автомобил</h2>
+            <form method="post" class="form">
+                <label>Име *<input type="text" name="name" required></label>
+                <label>Рег. номер<input type="text" name="plate"></label>
+                <label>Тип<input type="text" name="type" placeholder="напр. Автоцистерна"></label>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Добави</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<p style="margin-top:16px;"><a href="{{ url_for('employees.list_employees') }}">← Към служителите</a></p>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ "Редактиране" if employee else "Нов служител" }}{% endblock %}
+
+{% block content %}
+<div class="card narrow">
+    <h1>{{ "Редактиране на служител" if employee else "Нов служител" }}</h1>
+
+    <form method="post" class="form">
+        <label>Имена *
+            <input type="text" name="full_name" value="{{ employee.full_name if employee else '' }}" required>
+        </label>
+
+        {% if not employee %}
+        <label>Потребителско име *
+            <input type="text" name="username" required>
+        </label>
+        <label>Парола *
+            <input type="password" name="password" required>
+        </label>
+        {% endif %}
+
+        <label>Роля
+            <select name="role">
+                {% for r in roles %}
+                    <option value="{{ r }}" {% if employee and employee.role == r %}selected{% endif %}>{{ role_labels.get(r, r) }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Длъжност
+            <input type="text" name="position" value="{{ employee.position if employee else '' }}"
+                   placeholder="напр. Командир на отделение">
+        </label>
+
+        <label>Телефон
+            <input type="text" name="phone" value="{{ employee.phone if employee else '' }}">
+        </label>
+
+        <label>Автомобил
+            <select name="vehicle_id">
+                <option value="">— без —</option>
+                {% for v in vehicles %}
+                    <option value="{{ v.id }}" {% if employee and employee.vehicle_id == v.id %}selected{% endif %}>
+                        {{ v.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <a class="btn btn-outline" href="{{ url_for('employees.list_employees') }}">Отказ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
