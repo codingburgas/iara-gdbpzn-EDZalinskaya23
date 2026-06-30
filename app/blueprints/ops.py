@@ -31,6 +31,7 @@ def ops_messages_json():
            FROM ops_messages m LEFT JOIN users u ON u.id = m.user_id
            ORDER BY m.created_at DESC, m.id DESC LIMIT 30"""
     )
+    # Query is newest-first (to take the last 30); flip to oldest-first for display
     rows = list(reversed(rows))
 
     me = current_user()["id"]

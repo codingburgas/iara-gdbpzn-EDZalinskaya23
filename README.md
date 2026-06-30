@@ -21,10 +21,11 @@ tasks and resources, and chat per incident.
 │   ├── seed.sql            # base data (vehicles, templates)
 │   └── init_db.py          # optional manual rebuild
 ├── app/
-│   ├── init.py         # application factory
+│   ├── __init__.py     # application factory + blueprint registration
 │   ├── db.py               # database helper functions
 │   ├── seed.py             # builds the database + demo data
 │   ├── auth_utils.py       # login and access control (roles)
+│   ├── chat_reads.py       # chat "seen" receipts
 │   ├── blueprints/         # the modules (one file per topic)
 │   │   ├── public.py       # home + citizen report
 │   │   ├── auth.py         # login / logout
@@ -36,15 +37,14 @@ tasks and resources, and chat per incident.
 │   │   ├── messages.py     # per-incident chat
 │   │   └── ops.py          # operations channel (staff <-> control room)
 │   ├── templates/          # HTML pages
-│   └── static/             # CSS and JS
+│   └── static/             # CSS, JS and the logo image
 └── docs/
 └── diagrams/           # block diagrams (.drawio)
 ```
 
 ## Running
 
-```
-bash
+```bash
 # 1. Install the libraries
 pip install -r requirements.txt
 

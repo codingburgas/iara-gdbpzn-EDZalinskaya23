@@ -20,7 +20,6 @@ def report():
         address = request.form.get("address", "").strip()
         description = request.form.get("description", "").strip()
 
-        # Require type and address
         if not incident_type or not address:
             flash("Моля, попълнете тип и адрес на произшествието.", "danger")
             return render_template("public/report.html",

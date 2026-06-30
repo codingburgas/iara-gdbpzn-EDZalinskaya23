@@ -15,7 +15,6 @@ def login():
 
         user = db.query("SELECT * FROM users WHERE username = ?", (username,), one=True)
 
-        # Check that the user exists and the password matches
         if user is None or not check_password_hash(user["password_hash"], password):
             flash("Грешно потребителско име или парола.", "danger")
             return render_template("auth/login.html", username=username)
