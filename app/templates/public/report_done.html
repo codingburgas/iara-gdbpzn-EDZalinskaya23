@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Сигналът е приет{% endblock %}
+
+{% block content %}
+<div class="card narrow center">
+    <div class="big-check">✓</div>
+    <h1>Сигналът е приет</h1>
+    <p>Оперативният център получи вашия сигнал и ще реагира възможно най-бързо.</p>
+    <p class="muted">При непосредствена опасност за живота се обадете на <strong>112</strong>.</p>
+    <a class="btn btn-outline" href="{{ url_for('public.index') }}">Към началото</a>
+</div>
+{% endblock %}

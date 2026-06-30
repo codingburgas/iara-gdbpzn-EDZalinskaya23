@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Подаване на сигнал{% endblock %}
+
+{% block content %}
+<div class="card narrow">
+    <h1>Подаване на сигнал</h1>
+    <p class="muted">Опишете накратко какво се случва. Полетата със звезда (*) са задължителни.</p>
+
+    <form method="post" class="form">
+        <label>Тип на произшествието *
+            <select name="type" required>
+                <option value="">— изберете —</option>
+                <option value="Пожар" {% if type == 'Пожар' %}selected{% endif %}>Пожар</option>
+                <option value="Авария" {% if type == 'Авария' %}selected{% endif %}>Авария</option>
+                <option value="ПТП" {% if type == 'ПТП' %}selected{% endif %}>Пътен инцидент (ПТП)</option>
+                <option value="Спасяване" {% if type == 'Спасяване' %}selected{% endif %}>Спасяване</option>
+                <option value="Друго" {% if type == 'Друго' %}selected{% endif %}>Друго</option>
+            </select>
+        </label>
+
+        <label>Адрес / място *
+            <input type="text" name="address" value="{{ address or '' }}"
+                   placeholder="напр. гр. София, ул. ... № ..." required>
+        </label>
+
+        <label>Описание
+            <textarea name="description" rows="4"
+                      placeholder="Какво виждате? Има ли пострадали?">{{ description or '' }}</textarea>
+        </label>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Изпрати сигнала</button>
+            <a class="btn btn-outline" href="{{ url_for('public.index') }}">Отказ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
