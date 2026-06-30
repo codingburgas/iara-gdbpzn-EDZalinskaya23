@@ -13,10 +13,10 @@
         <mxCell id="factory" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="app/__init__.py&#xa;(factory — registers all modules)" vertex="1">
           <mxGeometry height="50" width="260" x="400" y="160" as="geometry" />
         </mxCell>
-        <mxCell id="bp" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" value="app/blueprints/ — modules (one file per topic)&#xa;public · auth · dashboard · employees · incidents · tasks · resources · messages" vertex="1">
+        <mxCell id="bp" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" value="app/blueprints/ — modules (one file per topic)&#xa;public · auth · dashboard · employees · incidents · tasks · resources · messages · ops" vertex="1">
           <mxGeometry height="120" width="380" x="120" y="300" as="geometry" />
         </mxCell>
-        <mxCell id="tpl" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="app/templates/ — HTML pages (Jinja2)&#xa;app/static/ — CSS and JS" vertex="1">
+        <mxCell id="tpl" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="app/templates/ — HTML pages (Jinja2)&#xa;app/static/ — CSS, JS, images" vertex="1">
           <mxGeometry height="60" width="300" x="560" y="300" as="geometry" />
         </mxCell>
         <mxCell id="dbpy" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="app/db.py&#xa;(helper functions query / execute)" vertex="1">

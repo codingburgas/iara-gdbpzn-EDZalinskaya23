@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="ER diagram (database)" id="er1">
+    <mxGraphModel dx="1407" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="vehicles" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="vehicles&#xa;&#xa;PK id&#xa;name&#xa;plate&#xa;type" vertex="1">
+          <mxGeometry height="110" width="180" x="60" y="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="users" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;" value="users&#xa;&#xa;PK id&#xa;full_name&#xa;username (UNIQUE)&#xa;password_hash&#xa;role&#xa;position&#xa;status&#xa;phone&#xa;FK vehicle_id" vertex="1">
+          <mxGeometry height="220" width="190" x="60" y="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="assignments" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;" value="incident_assignments&#xa;(incident team)&#xa;&#xa;PK id&#xa;FK incident_id&#xa;FK user_id&#xa;confirmed&#xa;UNIQUE(incident_id, user_id)" vertex="1">
+          <mxGeometry height="150" width="200" x="350" y="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="incidents" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;" value="incidents&#xa;&#xa;PK id&#xa;type&#xa;address&#xa;lat&#xa;lng&#xa;description&#xa;channel&#xa;status&#xa;created_at&#xa;FK created_by" vertex="1">
+          <mxGeometry height="240" width="200" x="640" y="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tasks" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;" value="tasks&#xa;&#xa;PK id&#xa;FK incident_id&#xa;FK assigned_to&#xa;category&#xa;description&#xa;status&#xa;created_at" vertex="1">
+          <mxGeometry height="170" width="190" x="940" y="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="resources" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;" value="resource_requests&#xa;&#xa;PK id&#xa;FK incident_id&#xa;FK requested_by&#xa;resource_type&#xa;description&#xa;status&#xa;created_at" vertex="1">
+          <mxGeometry height="180" width="190" x="940" y="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="messages" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;" value="messages&#xa;(per-incident chat)&#xa;&#xa;PK id&#xa;FK incident_id&#xa;FK user_id&#xa;body&#xa;created_at" vertex="1">
+          <mxGeometry height="160" width="190" x="940" y="480" as="geometry" />
+        </mxCell>
+
+        <mxCell id="templates" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#e1d5e7;strokeColor=#9673a6;" value="message_templates&#xa;(standalone — no FK)&#xa;&#xa;PK id&#xa;text" vertex="1">
+          <mxGeometry height="100" width="190" x="640" y="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ops" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;" value="ops_messages&#xa;(operations channel)&#xa;&#xa;PK id&#xa;FK user_id&#xa;body&#xa;created_at" vertex="1">
+          <mxGeometry height="140" width="190" x="350" y="470" as="geometry" />
+        </mxCell>
+
+        <mxCell id="reads" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f5f5f5;strokeColor=#999999;" value="chat_reads&#xa;(&quot;seen&quot; receipts)&#xa;&#xa;PK channel&#xa;PK channel_id&#xa;PK user_id (-&gt; users.id)&#xa;last_read_id" vertex="1">
+          <mxGeometry height="130" width="200" x="60" y="500" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_users_vehicles" edge="1" parent="1" source="users" target="vehicles" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="vehicle_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inc_users" edge="1" parent="1" source="incidents" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="created_by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_asg_inc" edge="1" parent="1" source="assignments" target="incidents" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="incident_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_asg_users" edge="1" parent="1" source="assignments" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="user_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_tasks_inc" edge="1" parent="1" source="tasks" target="incidents" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="incident_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_tasks_users" edge="1" parent="1" source="tasks" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;" value="assigned_to">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_res_inc" edge="1" parent="1" source="resources" target="incidents" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="incident_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_res_users" edge="1" parent="1" source="resources" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;" value="requested_by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_msg_inc" edge="1" parent="1" source="messages" target="incidents" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" value="incident_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_msg_users" edge="1" parent="1" source="messages" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;" value="user_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ops_users" edge="1" parent="1" source="ops" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;" value="user_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_reads_users" edge="1" parent="1" source="reads" target="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;" value="user_id (logical)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffffff;strokeColor=#cccccc;" value="Legend&#xa;— solid line: enforced FOREIGN KEY&#xa;— dashed line: nullable FK (ON DELETE SET NULL) or logical reference&#xa;Cardinality: parent (1) —&lt; (many) child" vertex="1">
+          <mxGeometry height="90" width="330" x="640" y="700" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
