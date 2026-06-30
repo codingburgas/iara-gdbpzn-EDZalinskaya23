@@ -6,14 +6,15 @@
     <title>{% block title %}ГДПБЗН — Система{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/mvr-logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body>
     <header class="topbar">
         <a class="brand" href="{{ url_for('public.index') }}">
-            <span class="brand-mark">[ПБ]</span>
+            <img class="brand-logo" src="{{ url_for('static', filename='img/mvr-logo.png') }}" alt="Герб на МВР">
             <span class="brand-text">ГДПБЗН · Система</span>
         </a>
 

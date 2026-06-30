@@ -3,7 +3,11 @@
 
 {% block content %}
 <div class="card narrow center">
-    <div class="big-check">✓</div>
+    <div class="big-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
     <h1>Сигналът е приет</h1>
     <p>Оперативният център получи вашия сигнал и ще реагира възможно най-бързо.</p>
     <p class="muted">При непосредствена опасност за живота се обадете на <strong>112</strong>.</p>
