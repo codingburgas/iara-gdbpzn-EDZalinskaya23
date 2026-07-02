@@ -19,18 +19,21 @@ def report():
         incident_type = request.form.get("type", "").strip()
         address = request.form.get("address", "").strip()
         description = request.form.get("description", "").strip()
+        # Optional GPS point, filled by the "use my location" button
+        lat = request.form.get("lat") or None
+        lng = request.form.get("lng") or None
 
         if not incident_type or not address:
             flash("Моля, попълнете тип и адрес на произшествието.", "danger")
             return render_template("public/report.html",
                                    type=incident_type, address=address,
-                                   description=description)
+                                   description=description, lat=lat, lng=lng)
 
         # Save the report as a new incident via the "Онлайн" channel
         db.execute(
-            """INSERT INTO incidents (type, address, description, channel, status)
-               VALUES (?, ?, ?, 'Онлайн', 'Нова')""",
-            (incident_type, address, description),
+            """INSERT INTO incidents (type, address, lat, lng, description, channel, status)
+               VALUES (?, ?, ?, ?, ?, 'Онлайн', 'Нова')""",
+            (incident_type, address, lat, lng, description),
         )
         return render_template("public/report_done.html")
 

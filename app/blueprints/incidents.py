@@ -182,6 +182,33 @@ def confirm_assignment(incident_id):
     return redirect(url_for("incidents.incident_detail", incident_id=incident_id))
 
 
+@incidents_bp.route("/incidents/<int:incident_id>/delete", methods=["POST"])
+@role_required("dispatcher", "admin")
+def delete_incident(incident_id):
+    """Delete an incident together with everything attached to it."""
+    incident = db.query("SELECT id FROM incidents WHERE id = ?", (incident_id,), one=True)
+    if incident is None:
+        flash("Произшествието не е намерено.", "danger")
+        return redirect(url_for("incidents.list_incidents"))
+
+    # Free any staff still assigned to this incident
+    db.execute(
+        """UPDATE users SET status = 'Наличен'
+           WHERE id IN (SELECT user_id FROM incident_assignments WHERE incident_id = ?)""",
+        (incident_id,),
+    )
+    # Remove chat "seen" receipts for this incident (this table has no cascade)
+    db.execute(
+        "DELETE FROM chat_reads WHERE channel = 'incident' AND channel_id = ?",
+        (incident_id,),
+    )
+    # Delete the incident. Team, tasks, resource requests and messages
+    # are removed automatically via ON DELETE CASCADE.
+    db.execute("DELETE FROM incidents WHERE id = ?", (incident_id,))
+    flash("Произшествието е изтрито.", "success")
+    return redirect(url_for("incidents.list_incidents"))
+
+
 @incidents_bp.route("/incidents/<int:incident_id>/status", methods=["POST"])
 @role_required("dispatcher", "admin")
 def change_incident_status(incident_id):

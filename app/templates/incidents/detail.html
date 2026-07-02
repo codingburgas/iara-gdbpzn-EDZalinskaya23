@@ -28,6 +28,11 @@
         </select>
         <button type="submit" class="btn btn-small btn-primary">Смени статуса</button>
     </form>
+    <form method="post" action="{{ url_for('incidents.delete_incident', incident_id=incident.id) }}"
+          class="inline" style="margin-left:8px;"
+          onsubmit="return confirm('Сигурни ли сте? Това ще изтрие произшествието и всички свързани данни (екип, задачи, ресурси, чат). Действието е необратимо.');">
+        <button type="submit" class="btn btn-small btn-outline">Изтрий произшествието</button>
+    </form>
     {% endif %}
 
     {# Confirm button: shown when the user is on the team and not confirmed #}

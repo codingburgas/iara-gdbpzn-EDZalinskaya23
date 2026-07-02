@@ -19,9 +19,18 @@
         </label>
 
         <label>Адрес / място *
-            <input type="text" name="address" value="{{ address or '' }}"
+            <input type="text" name="address" id="address" value="{{ address or '' }}"
                    placeholder="напр. гр. София, ул. ... № ..." required>
         </label>
+
+        <div style="margin:-4px 0 4px;">
+            <button type="button" id="geo-btn" class="btn btn-small btn-outline">📍 Използвай текущото ми местоположение</button>
+            <span id="geo-status" class="small muted"></span>
+        </div>
+
+        {# Filled automatically by the geolocation button; lets the dispatcher see the point on the map #}
+        <input type="hidden" name="lat" id="lat" value="{{ lat or '' }}">
+        <input type="hidden" name="lng" id="lng" value="{{ lng or '' }}">
 
         <label>Описание
             <textarea name="description" rows="4"
@@ -34,4 +43,38 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Let the citizen fill the address from their current GPS location (no typing).
+    document.getElementById('geo-btn').addEventListener('click', function () {
+        var status = document.getElementById('geo-status');
+        if (!navigator.geolocation) {
+            status.textContent = 'Браузърът не поддържа геолокация.';
+            return;
+        }
+        status.textContent = 'Определяне на местоположението…';
+        navigator.geolocation.getCurrentPosition(function (pos) {
+            var lat = pos.coords.latitude, lng = pos.coords.longitude;
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+            // Turn the coordinates into a readable address (OpenStreetMap / Nominatim).
+            fetch('https://nominatim.openstreetmap.org/reverse?format=json&accept-language=bg&lat=' + lat + '&lon=' + lng)
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    document.getElementById('address').value =
+                        (d && d.display_name) ? d.display_name : (lat.toFixed(6) + ', ' + lng.toFixed(6));
+                    status.textContent = 'Местоположението е добавено ✓';
+                })
+                .catch(function () {
+                    // If the address lookup fails, still submit the raw coordinates.
+                    document.getElementById('address').value = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                    status.textContent = 'Координатите са добавени (адресът не бе намерен).';
+                });
+        }, function (err) {
+            status.textContent = 'Неуспешно определяне на местоположение: ' + err.message;
+        });
+    });
+</script>
 {% endblock %}
